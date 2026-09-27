@@ -57,8 +57,20 @@ h1{font-family:var(--display);font-weight:700;font-size:clamp(34px,7vw,52px);lin
 .p3 .pip i:nth-child(1){background:var(--spruce)}
 
 ul.items{list-style:none;margin:0;padding:0;display:grid;gap:10px}
-.item{position:relative;display:grid;grid-template-columns:1fr auto;gap:4px 16px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px 14px 26px}
-.item::before{content:"";position:absolute;left:10px;top:20px;width:7px;height:7px;border-radius:50%;border:2px solid var(--line);background:var(--paper)}
+.item{display:grid;grid-template-columns:84px 1fr;gap:14px;align-items:start;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 16px 12px 12px}
+.item .body{display:grid;grid-template-columns:1fr auto;gap:4px 16px;min-width:0}
+.thumb{display:block;width:84px;height:84px;border-radius:8px;overflow:hidden;background:var(--paper);border:1px solid var(--line)}
+.thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.thumb.blank{display:grid;place-items:center;font-family:var(--display);font-weight:700;font-size:30px;color:var(--muted);background:var(--gold-soft);border-color:transparent}
+.p3 .thumb.blank{background:var(--spruce-soft)}
+.p1 .thumb.blank{background:var(--stamp-soft)}
+a.thumb:hover{border-color:var(--muted)}
+.photo-zone{display:flex;flex-wrap:wrap;align-items:center;gap:12px;border:1.5px dashed var(--line);border-radius:10px;padding:12px;background:var(--paper)}
+.photo-zone.drag{border-color:var(--spruce);background:var(--spruce-soft)}
+.photo-zone .thumb{width:72px;height:72px}
+.photo-zone .zone-text{flex:1 1 180px;font-size:14px;color:var(--muted)}
+.visually-hidden{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+@media (max-width:420px){.item{grid-template-columns:64px 1fr}.item .thumb{width:64px;height:64px}}
 .item .name{font-weight:600;font-size:17px;overflow-wrap:anywhere}
 .item .price{font-family:var(--mono);font-size:15px;font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap}
 .item .price.none{color:var(--muted);font-family:var(--body);font-size:14px}
@@ -128,6 +140,17 @@ footer.foot{margin-top:40px;font-size:13px;color:var(--muted)}
           <select id="f-priority"><option value="1">Really want</option><option value="2" selected>Would love</option><option value="3">Nice to have</option></select></div>
         <div class="field third"><label for="f-qty">Quantity</label><input id="f-qty" type="number" min="1" max="99" step="1" value="1"></div>
         <div class="field"><label for="f-notes">Details (size, color, model)</label><textarea id="f-notes" maxlength="400" placeholder="Size M, dark green or navy"></textarea></div>
+        <div class="field"><label for="f-photo">Photo (optional)</label>
+          <div class="photo-zone" id="photo-zone" tabindex="0" aria-describedby="photo-help">
+            <span class="thumb blank" id="photo-preview" aria-hidden="true">+</span>
+            <span class="zone-text" id="photo-help">On the store page, copy the product picture and paste it here, drag it in, or choose a saved photo.</span>
+            <span class="actions">
+              <label class="btn" for="f-photo">Choose photo</label>
+              <button class="btn quiet danger" type="button" id="photo-remove" hidden>Remove photo</button>
+            </span>
+            <input class="visually-hidden" id="f-photo" type="file" accept="image/*">
+          </div>
+        </div>
       </div>
       <div class="form-actions" style="margin-top:12px">
         <button class="btn primary" type="submit" id="f-submit">Add to list</button>
@@ -169,7 +192,7 @@ footer.foot{margin-top:40px;font-size:13px;color:var(--muted)}
     shell: document.getElementById("app").outerHTML,
     script: document.getElementById("app-script").textContent
   };
-  var RESET = ":root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px/1.4 system-ui,-apple-system,\"Segoe UI\",Roboto,sans-serif;background:#fafaf9}img{max-width:100%}[hidden]{display:none!important}";
+  var RESET = ":root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}";
   var STASH_KEY = "wishlist-unsaved";
   var PRIORITIES = {1:"Really want",2:"Would love",3:"Nice to have"};
   var BUDGETS = [
@@ -261,12 +284,19 @@ footer.foot{margin-top:40px;font-size:13px;color:var(--muted)}
   }
 
   function renderItem(it){
-    var li=el("li","item");
+    var outer=el("li","item");
+    var u=it.link && safeLink(it.link);
+    var th;
+    if(u){ th=el("a","thumb"); th.href=u.href; th.target="_blank"; th.rel="noopener noreferrer"; th.setAttribute("aria-label","Open "+it.name); }
+    else th=el("span","thumb");
+    if(isImg(it.img)){ var im=el("img"); im.src=it.img; im.alt=""; im.loading="lazy"; th.appendChild(im); }
+    else { th.classList.add("blank"); th.textContent=(it.name.trim()[0]||"?").toUpperCase(); }
+    outer.appendChild(th);
+    var li=el("div","body"); outer.appendChild(li);
     li.appendChild(el("div","name", it.name + (it.qty>1 ? " ×"+it.qty : "")));
     li.appendChild(el("div", "price"+(it.price==null?" none":""), it.price==null ? "No price" : money(it.price)));
     if(it.notes) li.appendChild(el("div","notes",it.notes));
     var r=el("div","row2");
-    var u=it.link && safeLink(it.link);
     if(u){
       var a=el("a","link","View item ↗"); a.href=u.href; a.target="_blank"; a.rel="noopener noreferrer";
       r.appendChild(a); r.appendChild(el("span","host",u.hostname.replace(/^www\./,"")));
@@ -280,8 +310,47 @@ footer.foot{margin-top:40px;font-size:13px;color:var(--muted)}
       ea.appendChild(e); ea.appendChild(d); r.appendChild(ea);
     }
     if(r.childNodes.length) li.appendChild(r);
-    return li;
+    return outer;
   }
+  function isImg(s){ return typeof s==="string" && /^data:image\/(jpeg|png|webp|gif);base64,/.test(s); }
+
+  // ---------- photos ----------
+  var pendingImg = null;
+  function showPhoto(){
+    var p=$("photo-preview"); p.textContent="";
+    if(isImg(pendingImg)){ p.className="thumb"; var im=el("img"); im.src=pendingImg; im.alt="Selected photo"; p.appendChild(im); }
+    else { p.className="thumb blank"; p.textContent="+"; }
+    $("photo-remove").hidden=!isImg(pendingImg);
+  }
+  // Shrink to a small JPEG so the whole list stays light enough to save.
+  function takeImage(file){
+    if(!file || !/^image\//.test(file.type)){ toast("That file isn’t a picture. Try a JPG or PNG."); return; }
+    var url=URL.createObjectURL(file); var img=new Image();
+    img.onload=function(){
+      var max=480, s=Math.min(1,max/Math.max(img.naturalWidth,img.naturalHeight));
+      var w=Math.max(1,Math.round(img.naturalWidth*s)), h=Math.max(1,Math.round(img.naturalHeight*s));
+      var c=document.createElement("canvas"); c.width=w; c.height=h;
+      var x=c.getContext("2d"); x.fillStyle="#fff"; x.fillRect(0,0,w,h); x.drawImage(img,0,0,w,h);
+      URL.revokeObjectURL(url);
+      pendingImg=c.toDataURL("image/jpeg",0.8); showPhoto(); toast("Photo added");
+    };
+    img.onerror=function(){ URL.revokeObjectURL(url); toast("Couldn’t read that picture. Try saving it first, then choose it."); };
+    img.src=url;
+  }
+  $("f-photo").addEventListener("change",function(){ var f=this.files&&this.files[0]; if(f) takeImage(f); this.value=""; });
+  $("photo-remove").addEventListener("click",function(){ pendingImg=null; showPhoto(); });
+  $("item-form").addEventListener("paste",function(ev){
+    var items=(ev.clipboardData&&ev.clipboardData.items)||[];
+    for(var i=0;i<items.length;i++){ if(items[i].kind==="file" && /^image\//.test(items[i].type)){ ev.preventDefault(); takeImage(items[i].getAsFile()); return; } }
+  });
+  var zone=$("photo-zone");
+  zone.addEventListener("dragover",function(ev){ ev.preventDefault(); zone.classList.add("drag"); });
+  zone.addEventListener("dragleave",function(){ zone.classList.remove("drag"); });
+  zone.addEventListener("drop",function(ev){
+    ev.preventDefault(); zone.classList.remove("drag");
+    var f=ev.dataTransfer&&ev.dataTransfer.files&&ev.dataTransfer.files[0];
+    if(f) takeImage(f); else toast("Drop a saved picture file, or copy the picture and paste it here.");
+  });
 
   // ---------- editing ----------
   function fillMetaFields(){ $("f-owner").value=state.owner||""; $("f-season").value=state.season||""; $("f-note").value=state.note||""; }
@@ -294,12 +363,14 @@ footer.foot{margin-top:40px;font-size:13px;color:var(--muted)}
   function resetForm(){
     ui.editId=null; $("item-form").reset(); $("f-priority").value="2"; $("f-qty").value="1";
     $("form-title").textContent="Add a wish"; $("f-submit").textContent="Add to list"; $("f-cancel").hidden=true;
+    pendingImg=null; showPhoto();
   }
   function startEdit(id){
     var it=state.items.filter(function(x){return x.id===id;})[0]; if(!it) return;
     ui.editId=id;
     $("f-name").value=it.name; $("f-link").value=it.link||""; $("f-price").value=it.price==null?"":it.price;
     $("f-priority").value=String(it.priority); $("f-qty").value=it.qty||1; $("f-notes").value=it.notes||"";
+    pendingImg=isImg(it.img)?it.img:null; showPhoto();
     $("form-title").textContent="Edit wish"; $("f-submit").textContent="Update wish"; $("f-cancel").hidden=false;
     $("item-form").scrollIntoView({behavior:"smooth",block:"center"}); $("f-name").focus({preventScroll:true});
   }
@@ -314,6 +385,7 @@ footer.foot{margin-top:40px;font-size:13px;color:var(--muted)}
     if(price!=null && !isFinite(price)) price=null;
     var qty=Math.min(99,Math.max(1,parseInt($("f-qty").value,10)||1));
     var data={name:name,link:link,price:price,priority:Number($("f-priority").value),qty:qty,notes:$("f-notes").value.trim()};
+    if(isImg(pendingImg)) data.img=pendingImg;
     if(ui.editId){
       state.items=state.items.map(function(x){ return x.id===ui.editId ? Object.assign({id:x.id},data) : x; });
       toast("Wish updated");
