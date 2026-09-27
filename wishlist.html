@@ -1,0 +1,430 @@
+<title>Holiday Wishlist</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Figtree:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
+<style id="page-style">
+:root{
+  --paper:#F4F3EE;--surface:#FFFFFF;--ink:#1C2440;--muted:#5B6278;--line:#DCDDE3;
+  --spruce:#2F6B55;--spruce-soft:#E3EFE9;--stamp:#B8402F;--stamp-soft:#F7E4DF;--gold:#9A6E16;--gold-soft:#F5EBD5;
+  --focus:#3C63C9;
+  --display:"Bricolage Grotesque",ui-sans-serif,system-ui,sans-serif;
+  --body:"Figtree",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  color-scheme:dark;
+  --paper:#11141C;--surface:#191D28;--ink:#ECEAE3;--muted:#A3A8B8;--line:#2B3142;
+  --spruce:#7CC0A2;--spruce-soft:#1D2E28;--stamp:#EA8676;--stamp-soft:#3A2220;--gold:#DDB464;--gold-soft:#332A18;
+  --focus:#8FA8F0;
+}}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --paper:#11141C;--surface:#191D28;--ink:#ECEAE3;--muted:#A3A8B8;--line:#2B3142;
+  --spruce:#7CC0A2;--spruce-soft:#1D2E28;--stamp:#EA8676;--stamp-soft:#3A2220;--gold:#DDB464;--gold-soft:#332A18;
+  --focus:#8FA8F0;
+}
+body{background:var(--paper);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.5}
+*{box-sizing:border-box}
+.wrap{max-width:760px;margin:0 auto;padding:40px 16px 120px}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+a{color:var(--spruce)}
+
+header.top{display:grid;gap:10px;margin-bottom:28px}
+.eyebrow{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--spruce);font-weight:600}
+h1{font-family:var(--display);font-weight:700;font-size:clamp(34px,7vw,52px);line-height:1.02;margin:0;letter-spacing:-.02em;text-wrap:balance}
+.note{margin:0;max-width:60ch;color:var(--muted);white-space:pre-line}
+.meta{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:14px;color:var(--muted);font-variant-numeric:tabular-nums}
+.meta b{color:var(--ink);font-weight:600}
+
+.toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:10px;justify-content:space-between;padding-block:14px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin-bottom:28px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:1px solid var(--line);background:transparent;border-radius:999px;padding:5px 12px;font-size:14px;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:8px 14px;font-weight:600;font-size:14px;cursor:pointer}
+.btn:hover{border-color:var(--muted)}
+.btn.primary{background:var(--spruce);border-color:var(--spruce);color:var(--paper)}
+.btn.quiet{background:transparent;border-color:transparent;color:var(--muted);padding-inline:8px}
+.btn.quiet:hover{color:var(--ink)}
+.btn.danger{color:var(--stamp)}
+
+.group{margin-bottom:34px}
+.group h2{display:flex;align-items:baseline;gap:10px;font-family:var(--display);font-weight:500;font-size:22px;margin:0 0 12px}
+.group h2 .count{font-family:var(--body);font-size:14px;color:var(--muted);font-weight:400}
+.pip{display:inline-flex;gap:3px;transform:translateY(-2px)}
+.pip i{width:8px;height:8px;border-radius:50%;background:var(--line)}
+.p1 .pip i{background:var(--stamp)}
+.p2 .pip i:nth-child(-n+2){background:var(--gold)}
+.p3 .pip i:nth-child(1){background:var(--spruce)}
+
+ul.items{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.item{position:relative;display:grid;grid-template-columns:1fr auto;gap:4px 16px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px 14px 26px}
+.item::before{content:"";position:absolute;left:10px;top:20px;width:7px;height:7px;border-radius:50%;border:2px solid var(--line);background:var(--paper)}
+.item .name{font-weight:600;font-size:17px;overflow-wrap:anywhere}
+.item .price{font-family:var(--mono);font-size:15px;font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap}
+.item .price.none{color:var(--muted);font-family:var(--body);font-size:14px}
+.item .notes{grid-column:1/-1;color:var(--muted);font-size:15px;overflow-wrap:anywhere;white-space:pre-line}
+.item .row2{grid-column:1/-1;display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;font-size:14px}
+.item .link{font-weight:600;text-decoration:none}
+.item .link:hover{text-decoration:underline}
+.item .host{color:var(--muted)}
+.tag-example{font-size:11px;letter-spacing:.08em;text-transform:uppercase;font-weight:600;color:var(--gold);background:var(--gold-soft);border-radius:4px;padding:2px 6px}
+.item .edit-actions{margin-left:auto;display:flex;gap:2px}
+
+.empty{padding:28px;border:1.5px dashed var(--line);border-radius:10px;text-align:center;color:var(--muted)}
+
+/* Editor */
+.editor{display:grid;gap:18px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px;margin-bottom:28px}
+.editor h3{margin:0;font-family:var(--display);font-weight:500;font-size:20px}
+.fields{display:grid;grid-template-columns:repeat(6,1fr);gap:12px}
+.field{display:grid;gap:4px;grid-column:span 6}
+.field.half{grid-column:span 3}
+.field.third{grid-column:span 2}
+.field label{font-size:13px;font-weight:600;color:var(--muted)}
+.field input,.field select,.field textarea{width:100%;border:1px solid var(--line);background:var(--paper);border-radius:8px;padding:9px 11px}
+.field textarea{resize:vertical;min-height:64px}
+.form-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.hint{font-size:13px;color:var(--muted)}
+.banner{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;background:var(--gold-soft);color:var(--ink);border-radius:10px;padding:12px 14px;margin-bottom:20px;font-size:14px}
+
+.savebar{position:fixed;left:0;right:0;bottom:0;padding:12px 16px calc(12px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--paper);display:flex;justify-content:center}
+.savebar .inner{max-width:760px;width:100%;display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+.savebar .btn{background:transparent;color:var(--paper);border-color:rgba(255,255,255,.3)}
+.savebar .btn.primary{background:var(--paper);color:var(--ink);border-color:var(--paper)}
+:root[data-theme="dark"] .savebar .btn{border-color:rgba(0,0,0,.3)}
+.status{font-size:14px}
+
+.toast{position:fixed;left:50%;bottom:84px;transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:8px 14px;border-radius:8px;font-size:14px;max-width:calc(100% - 32px)}
+textarea.copybox{width:100%;min-height:160px;margin-top:10px;border:1px solid var(--line);border-radius:8px;background:var(--surface);padding:10px;font-family:var(--mono);font-size:13px}
+
+footer.foot{margin-top:40px;font-size:13px;color:var(--muted)}
+
+@media (max-width:560px){
+  .field.half,.field.third{grid-column:span 6}
+  .wrap{padding-top:24px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+<div id="app" class="wrap">
+  <header class="top">
+    <div class="eyebrow" id="season"></div>
+    <h1 id="heading"></h1>
+    <p class="note" id="note"></p>
+    <div class="meta" id="meta"></div>
+  </header>
+  <div id="restore" hidden></div>
+  <section class="editor" id="editor" hidden aria-label="Edit your wishlist">
+    <div class="fields">
+      <div class="field half"><label for="f-owner">Your name</label><input id="f-owner" maxlength="40" placeholder="e.g. Sam"></div>
+      <div class="field half"><label for="f-season">List title</label><input id="f-season" maxlength="40" placeholder="Holidays 2026"></div>
+      <div class="field"><label for="f-note">Note to friends and family</label><textarea id="f-note" maxlength="500" placeholder="Sizes, favorite colors, stores you like, things you already have..."></textarea></div>
+    </div>
+    <form id="item-form" autocomplete="off">
+      <h3 id="form-title">Add a wish</h3>
+      <div class="fields" style="margin-top:12px">
+        <div class="field"><label for="f-name">What is it?</label><input id="f-name" required maxlength="120" placeholder="e.g. Noise-cancelling headphones"></div>
+        <div class="field"><label for="f-link">Link (optional)</label><input id="f-link" type="url" maxlength="600" placeholder="https://..."></div>
+        <div class="field third"><label for="f-price">Price, $ (optional)</label><input id="f-price" type="number" min="0" step="0.01" inputmode="decimal" placeholder="45"></div>
+        <div class="field third"><label for="f-priority">How much?</label>
+          <select id="f-priority"><option value="1">Really want</option><option value="2" selected>Would love</option><option value="3">Nice to have</option></select></div>
+        <div class="field third"><label for="f-qty">Quantity</label><input id="f-qty" type="number" min="1" max="99" step="1" value="1"></div>
+        <div class="field"><label for="f-notes">Details (size, color, model)</label><textarea id="f-notes" maxlength="400" placeholder="Size M, dark green or navy"></textarea></div>
+      </div>
+      <div class="form-actions" style="margin-top:12px">
+        <button class="btn primary" type="submit" id="f-submit">Add to list</button>
+        <button class="btn quiet" type="button" id="f-cancel" hidden>Cancel edit</button>
+        <span class="hint">Changes stay on this page until you press Save list.</span>
+      </div>
+    </form>
+  </section>
+  <div class="toolbar">
+    <div class="chips" role="group" aria-label="Filter by budget" id="budget"></div>
+    <div class="actions">
+      <button class="btn" id="copy-btn" type="button">Copy as text</button>
+      <button class="btn" id="edit-btn" type="button" hidden>Edit list</button>
+    </div>
+  </div>
+  <div id="copy-fallback" hidden></div>
+  <div id="groups"></div>
+  <footer class="foot" id="foot"></footer>
+  <div class="savebar" id="savebar" hidden>
+    <div class="inner">
+      <span class="status" id="save-status"></span>
+      <div class="actions">
+        <button class="btn" id="discard-btn" type="button">Discard</button>
+        <button class="btn primary" id="save-btn" type="button">Save list</button>
+      </div>
+    </div>
+  </div>
+  <div class="toast" id="toast" role="status" hidden></div>
+</div>
+<script id="wish-data" type="application/json">{"owner":"","season":"Holidays 2026","note":"Anything in \"Really want\" is at the top of my list. Sizes and colors are in the details.","updated":"","items":[{"id":"ex1","name":"Noise-cancelling wireless earbuds","link":"","price":129,"priority":1,"qty":1,"notes":"Any brand with good battery life","example":true},{"id":"ex2","name":"Pour-over coffee set","link":"","price":45,"priority":2,"qty":1,"notes":"Glass or ceramic dripper, gooseneck kettle if it fits the budget","example":true},{"id":"ex3","name":"Merino wool socks","link":"","price":24,"priority":3,"qty":2,"notes":"Size M, muted colors","example":true},{"id":"ex4","name":"Gift card to a local bookstore","link":"","price":25,"priority":3,"qty":1,"notes":"","example":true}]}</script>
+<script id="app-script">
+(function(){
+  "use strict";
+  // Source pieces used to regenerate the page on save (never the live DOM).
+  var SRC = {
+    title: document.querySelector("title") ? document.querySelector("title").outerHTML : "<title>Holiday Wishlist</title>",
+    fonts: (document.querySelector('link[href*="fonts.googleapis.com"]') || {outerHTML:""}).outerHTML,
+    style: document.getElementById("page-style").outerHTML,
+    shell: document.getElementById("app").outerHTML,
+    script: document.getElementById("app-script").textContent
+  };
+  var RESET = ":root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px/1.4 system-ui,-apple-system,\"Segoe UI\",Roboto,sans-serif;background:#fafaf9}img{max-width:100%}[hidden]{display:none!important}";
+  var STASH_KEY = "wishlist-unsaved";
+  var PRIORITIES = {1:"Really want",2:"Would love",3:"Nice to have"};
+  var BUDGETS = [
+    {id:"all",label:"Any price",test:function(){return true;}},
+    {id:"u30",label:"Under $30",test:function(p){return p!=null && p<30;}},
+    {id:"30-75",label:"$30 – $75",test:function(p){return p!=null && p>=30 && p<=75;}},
+    {id:"o75",label:"Over $75",test:function(p){return p!=null && p>75;}}
+  ];
+
+  var saved = JSON.parse(document.getElementById("wish-data").textContent);
+  var state = clone(saved);
+  var ui = {budget:"all", editing:false, editId:null, canWrite:null, readOnly:false, saving:false};
+  var $ = function(id){return document.getElementById(id);};
+
+  function clone(o){return JSON.parse(JSON.stringify(o));}
+  function dirty(){return JSON.stringify(state)!==JSON.stringify(saved);}
+  function money(n){return "$"+(Math.round(n*100)%100===0? n.toFixed(0) : n.toFixed(2));}
+  function safeLink(u){try{var x=new URL(u);return (x.protocol==="https:"||x.protocol==="http:")?x:null;}catch(e){return null;}}
+  function el(tag,cls,text){var e=document.createElement(tag);if(cls)e.className=cls;if(text!=null)e.textContent=text;return e;}
+  function uid(){return "w"+Date.now().toString(36)+Math.random().toString(36).slice(2,6);}
+  function toast(msg){var t=$("toast");t.textContent=msg;t.hidden=false;clearTimeout(toast._t);toast._t=setTimeout(function(){t.hidden=true;},2600);}
+  function ssGet(){try{return sessionStorage.getItem(STASH_KEY);}catch(e){return null;}}
+  function ssSet(v){try{ if(v==null) sessionStorage.removeItem(STASH_KEY); else sessionStorage.setItem(STASH_KEY,v);}catch(e){}}
+
+  function render(){
+    var who = state.owner ? state.owner.trim() : "";
+    $("season").textContent = state.season || "Holiday wishlist";
+    $("heading").textContent = who ? who + (/s$/i.test(who)?"’":"’s") + " wishlist" : "My wishlist";
+    document.title = who ? who + "’s Wishlist" : "Holiday Wishlist";
+    $("note").textContent = state.note || "";
+    $("note").hidden = !state.note;
+
+    var meta = $("meta"); meta.textContent = "";
+    var items = state.items;
+    var priced = items.filter(function(i){return i.price!=null;}).map(function(i){return i.price;});
+    var m1 = el("span"); m1.appendChild(el("b",null,String(items.length))); m1.appendChild(document.createTextNode(items.length===1?" wish":" wishes"));
+    meta.appendChild(m1);
+    if(priced.length){
+      var lo=Math.min.apply(null,priced), hi=Math.max.apply(null,priced);
+      var m2=el("span"); m2.appendChild(document.createTextNode("Prices ")); m2.appendChild(el("b",null, lo===hi?money(lo):money(lo)+"–"+money(hi))); meta.appendChild(m2);
+    }
+    if(state.updated){
+      var d=new Date(state.updated);
+      if(!isNaN(d)) meta.appendChild(el("span",null,"Updated "+d.toLocaleDateString(undefined,{month:"short",day:"numeric",year:"numeric"})));
+    }
+
+    // Budget chips
+    var chips=$("budget"); chips.textContent="";
+    BUDGETS.forEach(function(b){
+      var c=el("button","chip",b.label); c.type="button"; c.setAttribute("aria-pressed", String(ui.budget===b.id));
+      c.addEventListener("click",function(){ui.budget=b.id;render();});
+      chips.appendChild(c);
+    });
+
+    // Groups
+    var groups=$("groups"); groups.textContent="";
+    var test = BUDGETS.filter(function(b){return b.id===ui.budget;})[0].test;
+    var shown = items.filter(function(i){return ui.budget==="all" || test(i.price);});
+    if(!items.length){
+      groups.appendChild(el("div","empty", ui.editing ? "Your list is empty. Add your first wish above." : "Nothing on the list yet."));
+    } else if(!shown.length){
+      groups.appendChild(el("div","empty","Nothing in this price range. Try another filter."));
+    }
+    [1,2,3].forEach(function(p){
+      var list = shown.filter(function(i){return Number(i.priority)===p;});
+      if(!list.length) return;
+      var sec=el("section","group p"+p);
+      var h=el("h2"); var pip=el("span","pip"); pip.setAttribute("aria-hidden","true");
+      for(var k=0;k<3;k++) pip.appendChild(el("i"));
+      h.appendChild(pip); h.appendChild(document.createTextNode(PRIORITIES[p])); h.appendChild(el("span","count",String(list.length)));
+      sec.appendChild(h);
+      var ul=el("ul","items");
+      list.forEach(function(it){ ul.appendChild(renderItem(it)); });
+      sec.appendChild(ul);
+      groups.appendChild(sec);
+    });
+
+    var hasExamples = items.some(function(i){return i.example;});
+    $("foot").textContent = hasExamples ? "Items tagged Example are placeholders. Replace them with your own wishes." : "";
+
+    // Editor visibility
+    $("editor").hidden = !ui.editing;
+    $("edit-btn").hidden = !(ui.canWrite && !ui.readOnly);
+    $("edit-btn").textContent = ui.editing ? "Done editing" : "Edit list";
+    var isDirty = dirty();
+    $("savebar").hidden = !(isDirty && !ui.readOnly);
+    $("save-status").textContent = ui.saving ? "Saving…" : "You have unsaved changes";
+    $("save-btn").disabled = ui.saving; $("discard-btn").disabled = ui.saving;
+  }
+
+  function renderItem(it){
+    var li=el("li","item");
+    li.appendChild(el("div","name", it.name + (it.qty>1 ? " ×"+it.qty : "")));
+    li.appendChild(el("div", "price"+(it.price==null?" none":""), it.price==null ? "No price" : money(it.price)));
+    if(it.notes) li.appendChild(el("div","notes",it.notes));
+    var r=el("div","row2");
+    var u=it.link && safeLink(it.link);
+    if(u){
+      var a=el("a","link","View item ↗"); a.href=u.href; a.target="_blank"; a.rel="noopener noreferrer";
+      r.appendChild(a); r.appendChild(el("span","host",u.hostname.replace(/^www\./,"")));
+    }
+    if(it.example) r.appendChild(el("span","tag-example","Example"));
+    if(ui.editing){
+      var ea=el("span","edit-actions");
+      var e=el("button","btn quiet","Edit"); e.type="button"; e.addEventListener("click",function(){startEdit(it.id);});
+      var d=el("button","btn quiet danger","Remove"); d.type="button"; d.setAttribute("aria-label","Remove "+it.name);
+      d.addEventListener("click",function(){state.items=state.items.filter(function(x){return x.id!==it.id;}); if(ui.editId===it.id) resetForm(); render();});
+      ea.appendChild(e); ea.appendChild(d); r.appendChild(ea);
+    }
+    if(r.childNodes.length) li.appendChild(r);
+    return li;
+  }
+
+  // ---------- editing ----------
+  function fillMetaFields(){ $("f-owner").value=state.owner||""; $("f-season").value=state.season||""; $("f-note").value=state.note||""; }
+  ["f-owner","f-season","f-note"].forEach(function(id){
+    $(id).addEventListener("input",function(){
+      var key={"f-owner":"owner","f-season":"season","f-note":"note"}[id];
+      state[key]=$(id).value; render();
+    });
+  });
+  function resetForm(){
+    ui.editId=null; $("item-form").reset(); $("f-priority").value="2"; $("f-qty").value="1";
+    $("form-title").textContent="Add a wish"; $("f-submit").textContent="Add to list"; $("f-cancel").hidden=true;
+  }
+  function startEdit(id){
+    var it=state.items.filter(function(x){return x.id===id;})[0]; if(!it) return;
+    ui.editId=id;
+    $("f-name").value=it.name; $("f-link").value=it.link||""; $("f-price").value=it.price==null?"":it.price;
+    $("f-priority").value=String(it.priority); $("f-qty").value=it.qty||1; $("f-notes").value=it.notes||"";
+    $("form-title").textContent="Edit wish"; $("f-submit").textContent="Update wish"; $("f-cancel").hidden=false;
+    $("item-form").scrollIntoView({behavior:"smooth",block:"center"}); $("f-name").focus({preventScroll:true});
+  }
+  $("f-cancel").addEventListener("click",resetForm);
+  $("item-form").addEventListener("submit",function(ev){
+    ev.preventDefault();
+    var name=$("f-name").value.trim(); if(!name){$("f-name").focus();return;}
+    var link=$("f-link").value.trim();
+    if(link && !/^https?:\/\//i.test(link)) link="https://"+link;
+    if(link && !safeLink(link)){ toast("That link doesn’t look right. Paste the full web address."); $("f-link").focus(); return; }
+    var priceRaw=$("f-price").value.trim(); var price=priceRaw===""?null:Math.max(0,Number(priceRaw));
+    if(price!=null && !isFinite(price)) price=null;
+    var qty=Math.min(99,Math.max(1,parseInt($("f-qty").value,10)||1));
+    var data={name:name,link:link,price:price,priority:Number($("f-priority").value),qty:qty,notes:$("f-notes").value.trim()};
+    if(ui.editId){
+      state.items=state.items.map(function(x){ return x.id===ui.editId ? Object.assign({id:x.id},data) : x; });
+      toast("Wish updated");
+    } else {
+      state.items.push(Object.assign({id:uid()},data));
+      toast("Added “"+name+"”");
+    }
+    resetForm(); render(); $("f-name").focus();
+  });
+
+  $("edit-btn").addEventListener("click",function(){
+    ui.editing=!ui.editing; if(ui.editing){fillMetaFields();} else {resetForm();} render();
+  });
+  $("discard-btn").addEventListener("click",function(){ state=clone(saved); resetForm(); fillMetaFields(); ssSet(null); render(); toast("Changes discarded"); });
+
+  // ---------- copy as text ----------
+  function asText(){
+    var who=state.owner?state.owner.trim():"";
+    var lines=[(who?who+"’s ":"My ")+"wishlist"+(state.season?" · "+state.season:""),""];
+    if(state.note){lines.push(state.note,"");}
+    [1,2,3].forEach(function(p){
+      var list=state.items.filter(function(i){return Number(i.priority)===p;});
+      if(!list.length) return;
+      lines.push(PRIORITIES[p].toUpperCase());
+      list.forEach(function(it){
+        var s="• "+it.name+(it.qty>1?" ×"+it.qty:"")+(it.price!=null?" — "+money(it.price):"");
+        lines.push(s);
+        if(it.notes) lines.push("   "+it.notes.replace(/\n/g," "));
+        if(it.link && safeLink(it.link)) lines.push("   "+it.link);
+      });
+      lines.push("");
+    });
+    return lines.join("\n").trim();
+  }
+  $("copy-btn").addEventListener("click",function(){
+    var text=asText();
+    var fb=$("copy-fallback");
+    function fallback(){
+      fb.textContent=""; var ta=el("textarea","copybox"); ta.id="copy-text"; ta.readOnly=true; ta.value=text;
+      fb.appendChild(el("div","hint","Select all and copy this text:")); fb.appendChild(ta); fb.hidden=false; ta.focus(); ta.select();
+    }
+    try{
+      navigator.clipboard.writeText(text).then(function(){fb.hidden=true;toast("List copied. Paste it into a text or email.");},fallback);
+    }catch(e){fallback();}
+  });
+
+  // ---------- save (republish the page with new data) ----------
+  function buildHtml(){
+    var s=clone(state); s.updated=new Date().toISOString();
+    var json=JSON.stringify(s).replace(/</g,"\\u003c");
+    return "<!doctype html><html><head><meta charset=utf8><meta name=viewport content=\"width=device-width,initial-scale=1,viewport-fit=cover\"><style>"+RESET+"</style></head><body>"
+      + SRC.title + "\n" + SRC.fonts + "\n" + SRC.style + "\n" + SRC.shell + "\n"
+      + "<script id=\"wish-data\" type=\"application/json\">" + json + "<\/script>\n"
+      + "<script id=\"app-script\">" + SRC.script + "<\/script></body></html>";
+  }
+  function goReadOnly(){ ui.readOnly=true; ui.editing=false; ui.canWrite=false; render(); }
+  $("save-btn").addEventListener("click",function(){
+    if(ui.saving) return;
+    var cl=window.claude;
+    if(!cl || !cl.use){ toast("Saving isn’t available in this view."); return; }
+    ui.saving=true; render();
+    ssSet(JSON.stringify(state));
+    cl.use("artifact").then(function(art){
+      if(!art){ ui.saving=false; toast("Saving isn’t available in this view."); render(); return; }
+      return art.publish(buildHtml()).then(function(){
+        toast("Saved. Everyone with the link now sees this version.");
+      },function(err){
+        ui.saving=false;
+        var code=err&&err.code;
+        if(code==="conflict"){ toast("A newer version was saved elsewhere. Reloading it…"); return; }
+        if(code==="not_writer"||code==="not_granted"||code==="consent_required"||code==="not_declared"||code==="capability_disabled"||code==="capability_removed"){
+          ssSet(null); goReadOnly(); toast("This list is view-only for you."); return;
+        }
+        if(code==="rate_limited"){ toast("Saving too quickly. Wait a moment, then save again."); render(); return; }
+        if(code==="too_large"){ toast("The list is too long to save. Remove a few items or shorten notes."); render(); return; }
+        toast("Couldn’t save just now. Try again in a moment."); render();
+      });
+    });
+  });
+
+  // Restore edits that were in flight if a save hit a conflict and the page reloaded.
+  (function(){
+    var raw=ssGet(); ssSet(null);
+    if(!raw) return;
+    try{
+      var st=JSON.parse(raw);
+      if(JSON.stringify(st)===JSON.stringify(saved)) return;
+      var box=$("restore"); box.className="banner"; box.hidden=false;
+      box.appendChild(el("span",null,"You have edits that weren’t saved."));
+      var acts=el("span","actions");
+      var r=el("button","btn","Restore them"); r.type="button";
+      var x=el("button","btn quiet","Dismiss"); x.type="button";
+      r.addEventListener("click",function(){ state=st; ui.editing=true; fillMetaFields(); box.hidden=true; render(); });
+      x.addEventListener("click",function(){ box.hidden=true; });
+      acts.appendChild(r); acts.appendChild(x); box.appendChild(acts);
+    }catch(e){}
+  })();
+
+  render();
+
+  // Only people who can edit the page see the editor.
+  (function(){
+    var cl=window.claude; if(!cl || !cl.use) return;
+    Promise.all([cl.use("artifact"), cl.use("user")]).then(function(r){
+      var art=r[0], user=r[1];
+      if(!art) return;
+      if(user && user.canEdit){
+        return user.canEdit().then(function(ok){ ui.canWrite=!!ok; if(!ok) $("restore").hidden=true; render(); });
+      }
+      ui.canWrite=true; render(); // no identity info: offer editing; a refused save turns it off
+    }).catch(function(){});
+  })();
+})();
+</script>
